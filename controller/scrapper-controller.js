@@ -44,7 +44,6 @@ exports.getComments = async (req, res, next) => {
 
             reviews.forEach(com => {
               let resp = sentiment.analyze(com.comment);
-            //   console.log(resp)
               if(resp.score < 1){
                   badComments.push(com); 
                   return; 
