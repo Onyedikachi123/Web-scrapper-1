@@ -1,2 +1,0 @@
-web:    lein run -m mlw-api.web
-worker: lein run -m mlw-api.worker

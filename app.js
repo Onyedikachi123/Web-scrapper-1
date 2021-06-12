@@ -20,7 +20,7 @@ app.use('/scrapper-api/v1',scrapperRoute);
 
 app.use((error, req, res, next) => {
     res.status(error.status).json({
-        error
+        ...error
     });
 })
 

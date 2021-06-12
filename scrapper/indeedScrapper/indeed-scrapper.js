@@ -35,7 +35,7 @@ module.exports = {
                 const reviews = [];
                 const percentage = 0.5;
                 const percentile = __numberReviews >= 1000 ? percentage * __numberReviews : __numberReviews;
-                const divisor = percentile *0.1
+                const divisor = percentile *0.4
                 const numLinks = Math.floor(percentile / divisor);
 
                 if (isFirstScrape) {
@@ -86,6 +86,8 @@ module.exports = {
                 }
 
                 reviews.sort((a, b) => b.year - a.year);
+                console.log("done - indeed")
+
                 return { reviews, numberReviews: __numberReviews > reviews.length ? numberReviews.replace("k","K") : reviews.length.toString() };
             }
             return { reviews: [], numberReviews: 0 }

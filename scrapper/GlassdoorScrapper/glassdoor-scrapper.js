@@ -8,7 +8,7 @@ const GET_REVIEWS = async (page, reviews) => {
             reviewContent.forEach(el => {
                 let id = Math.random() * Math.random() * 1000000;
                 let reviewDetail = el.split('\n');
-                if(reviewDetail[0] || reviewDetail[8]){
+                if(reviewDetail[0] && reviewDetail[8]){
                     reviews.push({
                         id,
                         title: reviewDetail[0],
@@ -26,7 +26,7 @@ const GET_REVIEWS = async (page, reviews) => {
 
 }
 
-const GLASSDOOR_SCRAPPER = async (browser, company_name, pageId) => {
+const GLASSDOOR_SCRAPPER = async (browser, company_name, isFirstScrape, pageId) => {
 
     try {
         let review_link = `https://www.glassdoor.com/member/home/companies.htm`
@@ -39,19 +39,19 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name, pageId) => {
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
         await page.setUserAgent(userAgent);
         //turns request interceptor on
-        // await page.setRequestInterception(true);
-        // //if the page makes a  request to a resource type of image or stylesheet then abort that            request
+        await page.setRequestInterception(true);
+        //if the page makes a  request to a resource type of image or stylesheet then abort that            request
 
-        // page.on('request', request => {
-        //     if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
-        //         request.abort();
-        //     else
-        //         request.continue();
-        // });
+        page.on('request', request => {
+            if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
+                request.abort();
+            else
+                request.continue();
+        });
 
         console.log(`Navigating to ${review_link}...`);
         await page.goto(review_link);
-
+        await page.waitForSelector("#userEmail"); 
         //user login
         await page.type("#userEmail", process.env.GLASSDOOR_EMAIL);
         await page.type("#userPassword", process.env.GLASSDOOR_PASS);
@@ -85,8 +85,17 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name, pageId) => {
         const [totalReviews, other] = numberReviews.split("k");
 
         let __numberReviews = other === "" ? totalReviews * 1000 : totalReviews;
-        if (numberReviews > 10) {
+        if (__numberReviews > 10) {
             nextBtn = await page.$('.nextButton');
+        }
+        reviews = await GET_REVIEWS(page, []);
+        let __reviews;
+        let updatedReviews = [...reviews]
+
+        if(isFirstScrape){
+            console.log("done - glassdoor")
+            return { reviews, numberReviews: __numberReviews > reviews.length ? numberReviews.replace("k","K") : reviews.lenght.toString() };
+
         }
 
         const percentage = 0.5;
@@ -94,9 +103,7 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name, pageId) => {
         const divisor = percentile *0.1
         const numLinks = Math.floor(percentile / divisor);
 
-        reviews = await GET_REVIEWS(page, []);
-        let __reviews;
-        let updatedReviews = [...reviews]
+      
 
         for (let index = 1; index <= numLinks; index++) {
             await page.waitForSelector('.nextButton.css-sed91k')
@@ -106,7 +113,8 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name, pageId) => {
             updatedReviews.push(__reviews)
         }
         reviews = Array.from(updatedReviews).flat();
-        return { reviews, numberReviews: __numberReviews > reviews.length ? numberReviews.replace("k","K") : reviews.lenght.toString() };
+        console.log("done - glassdoor")
+        return { reviews, numberReviews: __numberReviews > reviews.length ? numberReviews.replace("k","K") : reviews.length.toString() };
 
         // return {reviews : [], numberReviews: null}
     } catch (error) {

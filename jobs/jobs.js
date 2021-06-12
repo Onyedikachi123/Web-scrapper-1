@@ -42,4 +42,3 @@ const scrapeProcess = async ({ data }) => {
 }
 module.exports = scrapeProcess;
 
-
