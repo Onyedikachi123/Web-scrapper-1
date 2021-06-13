@@ -50,21 +50,23 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name) => {
         //         request.continue();
         // });
         console.log(`Navigating to ${review_link}...`);
-        
-        await page.goto("www.google.com");
-         await page.waitForNavigation();
-        console.log("gone to google");
+
         await page.goto(review_link);
+        await page.waitForNavigation();
+         console.log(`gone to ${review_link}`);
         await page.waitForSelector("#userEmail"); 
+        
         //user login
         await page.type("#userEmail", process.env.GLASSDOOR_EMAIL);
+        console.log(`entered the user mail`);
         await page.type("#userPassword", process.env.GLASSDOOR_PASS);
+        console.log(`entered the user pass`);
         await page.click(`
                  #InlineLoginModule > div > div > div > div:nth-child(2) > 
                  div:nth-child(4) > form > div.mt-std.d-flex.flex-column.align-items-center > 
                  div:nth-child(1) > button
                  `);//
-
+console.log(`logged in`);
         await page.waitForNavigation();
         await page.goto(url.href);
 
