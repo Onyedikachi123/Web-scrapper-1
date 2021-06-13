@@ -9,8 +9,8 @@ const scrapeProcess = async ({ data }) => {
         console.log("started-job")
         let { company_name, _badPageId, _goodPageId } = data;
         let browser = await puppeteerBrowser();
-        pageScraper.scrapper.glassdoor_scrapper(browser, company_name)
-        .then(async ({reviews, numberReviews}) => {
+        let {reviews, numberReviews} = await pageScraper.scrapper.glassdoor_scrapper(browser, company_name)
+
             console.log("analyzing-reviews")
             let response = await pageScraper.scrapper.indeed_scrapper( browser, company_name, false );
             let gld_reviews = numberReviews.toString().split("K");
@@ -40,10 +40,7 @@ const scrapeProcess = async ({ data }) => {
                 numberReviews: numberReviews || 0,
             }));
             // console.log(job.id);
-            console.log("completed job"); 
-        })
-        .catch(error=> console.log(error));
-       
+            console.log("completed job");   
 
     } catch (error) {
         console.log(error)
