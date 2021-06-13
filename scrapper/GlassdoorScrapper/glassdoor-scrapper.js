@@ -50,10 +50,10 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name) => {
         // });
 
         console.log(`Navigating to ${review_link}...`);
+        console.log("glassdoor credentials - "+process.env.GLASSDOOR_EMAIL, process.env.GLASSDOOR_PASS)
         await page.goto(review_link);
         await page.waitForSelector("#userEmail"); 
         //user login
-        console.log("glassdoor credentials - "+process.env.GLASSDOOR_EMAIL, process.env.GLASSDOOR_PASS)
         await page.type("#userEmail", process.env.GLASSDOOR_EMAIL);
         await page.type("#userPassword", process.env.GLASSDOOR_PASS);
         await page.click(`
