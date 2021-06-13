@@ -14,9 +14,9 @@ const getReviews = async (data) => {
          * run background job to store the glassdoor reads on redis
          * 
          */
-        if(Page == 1){
+        // if(Page == 1){
             await scrapeProcess(data);
-        }
+        // }
         /* 
         */
 
