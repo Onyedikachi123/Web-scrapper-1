@@ -50,6 +50,10 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name) => {
         //         request.continue();
         // });
         console.log(`Navigating to ${review_link}...`);
+        
+        await page.goto("www.google.com");
+         await page.waitForNavigation();
+        console.log("gone to google");
         await page.goto(review_link);
         await page.waitForSelector("#userEmail"); 
         //user login
