@@ -39,15 +39,15 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name, isFirstScrape, pageId) 
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
         await page.setUserAgent(userAgent);
         //turns request interceptor on
-        await page.setRequestInterception(true);
-        //if the page makes a  request to a resource type of image or stylesheet then abort that            request
+        // await page.setRequestInterception(true);
+        // //if the page makes a  request to a resource type of image or stylesheet then abort that            request
 
-        page.on('request', request => {
-            if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
-                request.abort();
-            else
-                request.continue();
-        });
+        // page.on('request', request => {
+        //     if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
+        //         request.abort();
+        //     else
+        //         request.continue();
+        // });
 
         console.log(`Navigating to ${review_link}...`);
         await page.goto(review_link);
