@@ -8,7 +8,7 @@
     "npm": "6.14.6"
   },
   "scripts": {
-    "start": "GLASSDOOR_EMAIL=lou@bestpracticeinstitute.org GLASSDOOR_PASS=4MaryPoppins1*1 node app.js",
+    "start": "node app.js",
     "serve": "nodemon app.js"
   },
   "repository": {

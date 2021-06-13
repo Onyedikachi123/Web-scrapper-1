@@ -9,7 +9,9 @@ const scrapeProcess = async ({ data }) => {
         console.log("started-job")
         let { company_name, _badPageId, _goodPageId } = data;
         let browser = await puppeteerBrowser();
-        let { reviews, numberReviews } = await pageScraper.scrapper.glassdoor_scrapper(browser, company_name);
+        let {reviews, numberReviews} =  pageScraper.scrapper.glassdoor_scrapper(browser, company_name)
+        .then((response => response))
+        .catch(error=> console.log(error));
         console.log("analyzing-reviews")
         let response = await pageScraper.scrapper.indeed_scrapper( browser, company_name, false );
         let gld_reviews = numberReviews.toString().split("K");

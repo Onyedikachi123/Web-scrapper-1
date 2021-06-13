@@ -32,6 +32,7 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name) => {
         let review_link = `https://www.glassdoor.com/member/home/companies.htm`
         let url = new URL(`https://www.glassdoor.com/Search/results.htm?keyword=${company_name}`)
         let page = await browser.newPage();
+        
         await page.setDefaultTimeout(0);
 
         //set user agent to prevent the site from treating this scrapper as a bot;
@@ -48,9 +49,7 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name) => {
         //     else
         //         request.continue();
         // });
-
         console.log(`Navigating to ${review_link}...`);
-        console.log("glassdoor credentials - "+process.env.GLASSDOOR_EMAIL, process.env.GLASSDOOR_PASS)
         await page.goto(review_link);
         await page.waitForSelector("#userEmail"); 
         //user login
@@ -60,8 +59,8 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name) => {
                  #InlineLoginModule > div > div > div > div:nth-child(2) > 
                  div:nth-child(4) > form > div.mt-std.d-flex.flex-column.align-items-center > 
                  div:nth-child(1) > button
-                 `)
-        //
+                 `);//
+
         await page.waitForNavigation();
         await page.goto(url.href);
 
@@ -114,7 +113,7 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name) => {
 
         // return {reviews : [], numberReviews: null}
     } catch (error) {
-        console.log(error)
+       throw error
     }
 }
 
