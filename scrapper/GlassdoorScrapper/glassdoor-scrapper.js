@@ -26,7 +26,7 @@ const GET_REVIEWS = async (page, reviews) => {
 
 }
 
-const GLASSDOOR_SCRAPPER = async (browser, company_name, isFirstScrape, pageId) => {
+const GLASSDOOR_SCRAPPER = async (browser, company_name) => {
 
     try {
         let review_link = `https://www.glassdoor.com/member/home/companies.htm`
@@ -92,11 +92,6 @@ const GLASSDOOR_SCRAPPER = async (browser, company_name, isFirstScrape, pageId) 
         let __reviews;
         let updatedReviews = [...reviews]
 
-        if(isFirstScrape){
-            console.log("done - glassdoor")
-            return { reviews, numberReviews: __numberReviews > reviews.length ? numberReviews.replace("k","K") : reviews.lenght.toString() };
-
-        }
 
         const percentage = 0.5;
         const percentile = __numberReviews >= 1000 ? percentage * __numberReviews : __numberReviews;
