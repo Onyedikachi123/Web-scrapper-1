@@ -10,15 +10,7 @@ module.exports = {
             let url = new URL(review_link);
 
             let page = await browser.newPage();
-            // await page.setDefaultTimeout(0);
-
-            //set user agent to prevent the site from treating this scrapper as a bot;
-            const userAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +
-                'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
-            await page.setUserAgent(userAgent);
-            console.log(`Navigating to ${review_link}...`);
-            await page.goto(url.href);
-            //turns request interceptor on
+            await page.setDefaultTimeout(0);
             await page.setRequestInterception(true);
             //if the page makes a  request to a resource type of image or stylesheet then abort that            request
             page.on('request', request => {
@@ -27,6 +19,14 @@ module.exports = {
                 else
                     request.continue();
             });
+            //set user agent to prevent the site from treating this scrapper as a bot;
+            const userAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +
+                'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
+            await page.setUserAgent(userAgent);
+            console.log(`Navigating to ${review_link}...`);
+            await page.goto(url.href);
+            //turns request interceptor on
+           
             const getRev = await page.$(".cmp-CompactHeaderMenuItem-count");
             if (getRev) {
                 let numberReviews = await page.$eval(".cmp-CompactHeaderMenuItem-count", count => count.innerText);

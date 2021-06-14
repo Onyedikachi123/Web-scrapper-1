@@ -9,7 +9,7 @@ const scrapeProcess = async ({ data }) => {
         console.log("started-job")
         let { company_name, _badPageId, _goodPageId } = data;
         let browser = await puppeteerBrowser();
-        let {reviews, numberReviews} = await pageScraper.scrapper.glassdoor_scrapper(browser, company_name)
+        let {reviews, numberReviews} = await pageScraper.scrapper.career_scrapper(browser, company_name)
 
             console.log("analyzing-reviews")
             let response = await pageScraper.scrapper.indeed_scrapper( browser, company_name, false );
@@ -20,27 +20,62 @@ const scrapeProcess = async ({ data }) => {
             let { goodComments, badComments } = analyzeReviews([...reviews, ...response.reviews], numberReviews); 
             console.log("analyzing-reviews-finshed")
             console.log("calculating-percentage")
-            let goodPercent = ((goodComments.length / (goodComments.length + badComments.length)) * 100).toFixed(2) || 0;
-            let badPercent = (100 - goodPercent).toFixed(2) || 0;
+           
             console.log("calculated-percentage")
     
             if(gld_reviews.length > 1 || ind_reviews.length > 1){
                 numberReviews += "K" 
             }
             console.log("storing in redis")
+
+            client.get(company_name, (err, data)=> {
+                if(err){
+                    console.log(error)
+                }
+
+                if(data){
+
+                    let {comments} = JSON.parse(data); 
+                    
+                    let _badComments =  [...comments.badComments, ...badComments];
+                    let _goodComments =  [...comments.goodComments, ...goodComments];
+                    let goodPercent =  0;
+                    let badPercent =  0;
+
+                    if(_goodComments.length + _badComments.length > 0){
+                       goodPercent = ((_goodComments.length / (_goodComments.length + _badComments.length)) * 100).toFixed(2) || 0;
+                        badPercent = (100 - goodPercent).toFixed(2) || 0;
+                    }
+                    
+                    client.setex(company_name,3600, JSON.stringify({
+                        company_name,
+                        goodPercent: goodPercent || 0,
+                        goodPageId: _goodPageId,
+                        badPageId: _badPageId,
+                        badPercent: badPercent || 0 ,
+                        comments: { badComments : _badComments, goodComments: _goodComments },
+                        reviewStatus: "ACT",
+                        numberReviews: numberReviews || 0,
+                    }));
+                }else{
+                    client.setex(company_name,3600, JSON.stringify({
+                        company_name,
+                        goodPercent,
+                        badPercent,
+                        comments: { badComments, goodComments },
+                        goodPageId: _goodPageId,
+                        badPageId: _badPageId,
+                        reviewStatus: "ACT",
+                        numberReviews: numberReviews || 0,
+                    }));
+                }
+
+                console.log("completed job");   
+
+            })
     
-            client.setex(company_name,3600, JSON.stringify({
-                company_name,
-                goodPercent,
-                goodPageId: _goodPageId,
-                badPageId: _badPageId,
-                badPercent,
-                comments: { badComments, goodComments },
-                reviewStatus: "ACT",
-                numberReviews: numberReviews || 0,
-            }));
+           
             // console.log(job.id);
-            console.log("completed job");   
 
     } catch (error) {
         console.log(error)

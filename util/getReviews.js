@@ -7,7 +7,7 @@ const getReviews = async (data) => {
     try {
         let { company_name, isFirstScrape, Page } = data
         let browser = await puppeteerBrowser();
-        // let { reviews, numberReviews } = await pageScraper.scrapper.glassdoor_scrapper(browser, company_name, isFirstScrape, Page);
+
         let { reviews, numberReviews } = await pageScraper.scrapper.indeed_scrapper(browser, company_name, isFirstScrape, Page);
 
         /**

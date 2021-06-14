@@ -31,16 +31,16 @@ const scrapeReviews = async ({ res, company_name, _badPageId, _goodPageId }) => 
             let badPercent = (100 - goodPercent).toFixed(2) || 0;
 
             //stores scrapped results/reviews on redis 
-            // setClient(company_name, {
-            //     company_name,
-            //     comments: { badComments, goodComments },
-            //     goodPercent,
-            //     goodPageId: _goodPageId,
-            //     badPageId: _badPageId,
-            //     badPercent,
-            //     reviewStatus: "PEN",
-            //     numberReviews: numberReviews || "0"
-            // });
+            setClient(company_name, {
+                company_name,
+                comments: { badComments, goodComments },
+                goodPercent: 0,
+                goodPageId: _goodPageId,
+                badPageId: _badPageId,
+                badPercent: 0,
+                reviewStatus: "PEN",
+                numberReviews: ""
+            });
 
             //sends reviews to user 
             res.status(200).json({
@@ -141,7 +141,7 @@ exports.getMore = async (req, res, next) => {
                 throw err;
             }
             if (data) {
-                let { comments: { goodComments, badComments } } = JSON.parse(data);
+                let { comments: { goodComments, badComments }, reviewStatus } = JSON.parse(data);
 
                 const START_INDEX_GD_COMMENTS = (NUM_OF_COMMENTS_PER_PAGE * +goodPageId) - NUM_OF_COMMENTS_PER_PAGE;
                 const START_INDEX_BD_COMMENTS = (NUM_OF_COMMENTS_PER_PAGE * +badPageId) - NUM_OF_COMMENTS_PER_PAGE;
@@ -152,7 +152,8 @@ exports.getMore = async (req, res, next) => {
                     comments: {
                         goodComments: goodComments.splice(START_INDEX_GD_COMMENTS, NUM_OF_COMMENTS_PER_PAGE),
                         badComments: badComments.splice(START_INDEX_BD_COMMENTS, NUM_OF_COMMENTS_PER_PAGE)
-                    }
+                    },
+                    reviewStatus
                 })}\n\n`);
                 res.end();
             } else {
@@ -190,7 +191,8 @@ exports.getReviews = async (req, res, next) => {
             let {
                 numberReviews,
                 goodPercent,
-                badPercent
+                badPercent,
+                reviewStatus
             } = JSON.parse(data)
 
             res.writeHead(200, headers);
@@ -198,14 +200,16 @@ exports.getReviews = async (req, res, next) => {
             res.write(`data: ${JSON.stringify({
                 numberReviews,
                 goodPercent,
-                badPercent
+                badPercent,
+                reviewStatus
             })}\n\n`);
             res.end();
         } else {
             data = {
                 numberReviews: "",
-                goodPercent: "",
-                badPercent: ""
+                goodPercent: 0,
+                badPercent: 0,
+                reviewStatus:"PEN"
             }
             res.writeHead(200, headers);
             res.write(`data: ${JSON.stringify(data)} \n\n`);
