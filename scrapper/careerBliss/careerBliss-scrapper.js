@@ -53,7 +53,7 @@ module.exports = {
                     contents.forEach(el => {
                         let id = Math.random() * Math.random() * 10000; 
                         let [employee, location, emptyText, comment] = el.split('\n');
-                        reviews.push({ id, employee: employee + " " + location, comment: comment.trim(), scrapper: "CareerBliss.com" });
+                        reviews.push({ id, employee: employee + " " + location, comment, scrapper: "CareerBliss.com" });
                     });
                     if (contents.length < 16) {
                         break;

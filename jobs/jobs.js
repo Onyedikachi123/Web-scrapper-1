@@ -20,7 +20,8 @@ const scrapeProcess = async ({ data }) => {
             let { goodComments, badComments } = analyzeReviews([...reviews, ...response.reviews], numberReviews); 
             console.log("analyzing-reviews-finshed")
             console.log("calculating-percentage")
-           
+            let goodPercent = ((goodComments.length / (goodComments.length + badComments.length)) * 100).toFixed(2) || 0;
+            let badPercent = (100 - goodPercent).toFixed(2) || 0;
             console.log("calculated-percentage")
     
             if(gld_reviews.length > 1 || ind_reviews.length > 1){
