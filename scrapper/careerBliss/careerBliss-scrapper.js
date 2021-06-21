@@ -65,7 +65,7 @@ module.exports = {
             return { reviews: [], numberReviews: 0 };
 
         } catch (error) {
-            throw error
+            console.log(error);
         }
     }
 }
