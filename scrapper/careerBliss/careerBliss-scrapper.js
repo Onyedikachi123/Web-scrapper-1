@@ -31,7 +31,9 @@ module.exports = {
                 const [th, hun] = numberReviews.split(",");
                 if (hun) {
                     numberReviews = Number.parseInt(th + hun);
-                }
+                }  
+               
+                  
 
                 const reviews = [];
                 const percentage = 0.5;
@@ -59,7 +61,7 @@ module.exports = {
                         break;
                     }
                 }
-
+                numberReviews = hun ? th + "K" : numberReviews; 
                 return { reviews, numberReviews };
             }
             return { reviews: [], numberReviews: 0 };
