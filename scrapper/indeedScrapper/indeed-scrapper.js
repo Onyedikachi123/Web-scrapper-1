@@ -23,26 +23,29 @@ module.exports = {
             const userAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +
                 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
             await page.setUserAgent(userAgent);
-            console.log(`Navigating to ${review_link}...`);
+            console.log(`Navigating to ${url.href}...`);
             await page.goto(url.href);
             //turns request interceptor on
-           
-            const getRev = await page.$(".cmp-CompactHeaderMenuItem-count");
+            // await page.waitForSelector('.cmp-CompactHeaderMenuItem-count');
+            // const getRev = await page.$(".cmp-CompactHeaderMenuItem-count");
+            const totalReviewsClassName = "#cmp-skip-header-desktop > div > ul > li.css-4b1u8p-Box.eu4oa1w0 > a > div";
+            const reviewsListClassName = ".css-lqffld-Box";
+            const getRev = await page.$(totalReviewsClassName);
             if (getRev) {
-                let numberReviews = await page.$eval(".cmp-CompactHeaderMenuItem-count", count => count.innerText);
+                let numberReviews = await page.$eval(totalReviewsClassName, count => count.innerText);
                 const [totalReviews, other] = numberReviews.split("K");
                 __numberReviews = other === "" ? totalReviews * 1000 : totalReviews;
                 const reviews = [];
                 const percentage = 0.5;
                 const percentile = __numberReviews >= 1000 ? percentage * __numberReviews : __numberReviews;
-                const divisor = percentile *0.4
+                const divisor = percentile * 0.4
                 const numLinks = Math.floor(percentile / divisor);
 
                 if (isFirstScrape) {
 
-                    await page.goto(`https://www.indeed.com/cmp/${company_name}/reviews?fcountry=ALL&start=${20 * Page}`);
-                    await page.waitForSelector(".cmp-Review-content");
-                    const contents = await page.$$eval("div.cmp-Review-content", reviewcontents => {
+                    await page.goto(`${review_link}&start=${20 * Page}`);
+                    await page.waitForSelector(reviewsListClassName);
+                    const contents = await page.$$eval(reviewsListClassName, reviewcontents => {
 
                         return reviewcontents
                             .map(comment => comment.innerText.trim())
@@ -50,19 +53,21 @@ module.exports = {
                     });
                     contents.forEach(el => {
                         let id = Math.random() * Math.random() * 1000000;
-                        let [title, employee, comment] = el.split('\n');
+                        let [rating, title, employee, ...comment] = el.split('\n');
                         //split title for date
                         let employeeData = employee.split('-');
+                        
+                        let comments = comment.filter((com, ind)=> ind < 5).join();
 
                         let year = employeeData[employeeData.length - 1]
                             .split(',')[1];
-                        reviews.push({ id, title, year, employee, comment, scrapper: "indeed.com" });
+                        reviews.push({ id, title, year, employee, comment: comments, scrapper: "indeed.com" });
                     });
 
 
                 } else {
                     for (let index = 2; index < numLinks; index++) {
-                        await page.goto(`https://www.indeed.com/cmp/${company_name}/reviews?fcountry=ALL&start=${20 * index}`);
+                        await page.goto(`${review_link}&start=${20 * index}`);
                         await page.waitForSelector(".cmp-Review-content");
 
                         const contents = await page.$$eval("div.cmp-Review-content", reviewcontents => {
@@ -73,13 +78,14 @@ module.exports = {
                         });
                         contents.forEach(el => {
                             let id = Math.random() * Math.random() * 1000000;
-                            let [title, employee, comment] = el.split('\n');
+                            let [rating, title, employee, ...comment] = el.split('\n');
                             //split title for date
                             let employeeData = employee.split('-');
+                            let comments = comment.filter((com, ind)=> ind < 5).join();
 
                             let year = employeeData[employeeData.length - 1]
                                 .split(',')[1];
-                            reviews.push({ id, title, year, employee, comment, scrapper: "indeed.com" });
+                            reviews.push({ id, title, year, employee, comment: comments, scrapper: "indeed.com" });
                         });
                     }
 
@@ -88,11 +94,11 @@ module.exports = {
                 reviews.sort((a, b) => b.year - a.year);
                 console.log("done - indeed")
 
-                return { reviews, numberReviews: __numberReviews > reviews.length ? numberReviews.replace("k","K") : reviews.length.toString() };
+                return { reviews, numberReviews: __numberReviews > reviews.length ? numberReviews.replace("k", "K") : reviews.length.toString() };
             }
             return { reviews: [], numberReviews: 0 }
         } catch (error) {
-            console.log(error) ;
+            console.log(error);
         }
     }
 }

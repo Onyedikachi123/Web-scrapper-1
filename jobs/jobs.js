@@ -17,7 +17,7 @@ const scrapeProcess = async ({ data }) => {
             let ind_reviews = response.numberReviews.toString().split("K");
             numberReviews = +gld_reviews[0] + +ind_reviews[0];
             console.log("analyzing-reviews")
-            let { goodComments, badComments } = analyzeReviews([...reviews, ...response.reviews], numberReviews); 
+            let { goodComments, badComments } = analyzeReviews([ ...response.reviews, ...reviews], numberReviews); 
             console.log("analyzing-reviews-finshed")
             console.log("calculating-percentage")
             let goodPercent = ((goodComments.length / (goodComments.length + badComments.length)) * 100).toFixed(2) || 0;
@@ -28,7 +28,7 @@ const scrapeProcess = async ({ data }) => {
                 numberReviews += "K" 
             }
             console.log("storing in redis")
-
+//store data in redis 
             client.get(company_name, (err, data)=> {
                 if(err){
                     console.log(error)
